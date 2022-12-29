@@ -23,7 +23,7 @@ gameData.set('B', {
 });
 gameData.set('C', {
     player: 1,
-    name: "Scissers",
+    name: "Scissors",
     value: 3
 });
 gameData.set('X', {
@@ -38,19 +38,52 @@ gameData.set('Y', {
 });
 gameData.set('Z', {
     player: 2,
-    name: "Scissers",
+    name: "Scissors",
     value: 3
 });
 
-const doGameStep = (entry: string) => {
-    const steps = entry.split(' ');
-    const ourPlay = gameData.get(steps[0]);
-    const opponentPlay = gameData.get(steps[1]);
-    if (ourPlay && opponentPlay) {
-        console.log(`we played ${ourPlay.name} and our opponent played ${opponentPlay.name}!`);
+const Rules = new Map<String, String>();
+    
+Rules.set('Scissors', 'Paper');
+Rules.set('Paper', 'Rock');
+Rules.set('Rock', 'Scissors');
+
+const playRPC = (ourPlay: Play, opponentPlay: Play) => {
+    if (Rules.get(ourPlay.name) === opponentPlay.name) {
+        console.log('We won this round!');
+        return 6;
+    } else if (Rules.get(opponentPlay.name) === ourPlay.name) {
+        console.log('We lost this round!');
+        return 0;
+    } else {
+        console.log('This round was a draw!');
+        return 3;
     }
 }
 
-for (const entry of input) {
-    doGameStep(entry);
+const doGameStep = (entry: string) => {
+    console.log('------------------------------------------');
+    
+    let roundScore = 0;
+    
+    const steps        = entry.split(' ');
+    const ourPlay      = gameData.get(steps[0]);
+    const opponentPlay = gameData.get(steps[1]);
+    
+    if (ourPlay && opponentPlay) {
+        console.log(`we played ${ourPlay.name} and our opponent played ${opponentPlay.name}!`);
+        roundScore += ourPlay.value;
+        roundScore += playRPC(ourPlay, opponentPlay)
+    }
+
+    console.log('Our score this round was: ' + roundScore);
+    return roundScore;
 }
+
+let total = 0;
+
+for (const entry of input) {
+    total += doGameStep(entry);
+}
+
+console.log(total);
